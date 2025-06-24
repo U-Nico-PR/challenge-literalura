@@ -11,18 +11,16 @@ Esta clase recive la URL para consumir la API con solo un método statico
  */
 public class ConsumoAPI {
 
-    public static String obtenerDatos(String url){
+    public static String obtenerDatos(String url) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest reques = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .build();
         HttpResponse<String> response = null;
-        try{
+        try {
             response = client
                     .send(reques, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e){
-            throw new RuntimeException();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
         return response.body();
