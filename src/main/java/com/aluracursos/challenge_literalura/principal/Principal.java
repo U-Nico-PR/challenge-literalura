@@ -1,8 +1,6 @@
 package com.aluracursos.challenge_literalura.principal;
 
-import com.aluracursos.challenge_literalura.model.Datos;
-import com.aluracursos.challenge_literalura.model.DatosLibro;
-import com.aluracursos.challenge_literalura.repository.IRepositorio;
+import com.aluracursos.challenge_literalura.model.*;
 import com.aluracursos.challenge_literalura.service.ConsumoAPI;
 import com.aluracursos.challenge_literalura.service.ConvertirDatos;
 
@@ -18,11 +16,6 @@ public class Principal {
     private static final String BASE_URL = "https://gutendex.com/books/";
     private Scanner teclado = new Scanner(System.in);
     private ConvertirDatos conversor = new ConvertirDatos();
-    private IRepositorio repositorio;
-
-    public Principal(IRepositorio repositorio){
-        this.repositorio = repositorio;
-    }
 
     // Método que solo muestra las opciones del menú.
     private int menu() {
@@ -79,16 +72,6 @@ public class Principal {
     private void registarLibro() {
         System.out.println("Ingresa el titulo del libro:");
         var titulo = teclado.nextLine();
-        if(!libroRegistrado(titulo)) {
-            Optional<DatosLibro> libro = obtenerLibro(titulo);
-            if (libro.isPresent()) {
-                System.out.println(libro.get());
-            } else {
-                System.out.println("Libro no encontrado.");
-            }
-        } else {
-            System.out.println("Libro ya registrado.");
-        }
     }
 
     private void listarLibros() {
@@ -103,15 +86,10 @@ public class Principal {
     private void listarLibrosPorIdioma() {
     }
 
-    private boolean libroRegistrado(String titulo) {
-        return false;
-    }
-
     private Optional<DatosLibro> obtenerLibro(String titulo){
         var json = ConsumoAPI.obtenerDatos(BASE_URL + "?search=" + titulo.replace(" ", "+"));
         Datos datos = conversor.convierteDatos(json, Datos.class);
         // Regreso el primer libro encontrado
         return datos.resultados().stream().findFirst();
     }
-
 }
