@@ -1,6 +1,7 @@
 package com.aluracursos.challenge_literalura;
 
 import com.aluracursos.challenge_literalura.principal.Principal;
+import com.aluracursos.challenge_literalura.repository.IRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
