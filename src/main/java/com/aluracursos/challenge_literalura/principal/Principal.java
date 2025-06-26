@@ -6,20 +6,20 @@ import com.aluracursos.challenge_literalura.service.ConsumoAPI;
 import com.aluracursos.challenge_literalura.service.ConvertirDatos;
 
 import java.util.*;
-
 /*
 Esta clase tiene las funcionalidades objetivo que se presenta al usuario por terminal.
-Igualmente se usa para testeo (esto no es recomendable).
  */
 public class Principal {
+
+    // Atributos requeridos para el reto
     private static final String BASE_URL = "https://gutendex.com/books/";
     private Scanner teclado = new Scanner(System.in);
     private ConvertirDatos conversor = new ConvertirDatos();
     private IRepositorio repositorio;
-
     private List<Autor> autores;
     private List<Libro> libros;
 
+    // Constructor con la inyección de dependencia
     public Principal(IRepositorio repositorio) {
         this.repositorio = repositorio;
     }
@@ -76,6 +76,7 @@ public class Principal {
         }
     }
 
+    // Método para registrar un libro en la base de datos
     private void registarLibro() {
         System.out.println("Ingresa el titulo del libro:");
         var titulo = teclado.nextLine();
@@ -91,23 +92,68 @@ public class Principal {
         }
     }
 
+    // Método que lista los libros que estan registrados
     private void listarLibros() {
         libros = repositorio.obtenerLibros();
-        libros.forEach(System.out::println);
+        List<Libro> listaOrdenada = libros.stream()
+                .sorted(Comparator.comparing(Libro::getTitulo)).
+                toList();
+        listaOrdenada.forEach(System.out::println);
     }
 
+    // Método que lista los autores que estan registrados
     private void listarAutores() {
         autores = repositorio.findAll();
-        autores.forEach(System.out::println);
-
+        List<Autor> listaOrdenada = autores.stream()
+                .sorted(Comparator.comparing(Autor::getNombre))
+                .toList();
+        listaOrdenada.forEach(System.out::println);
     }
 
+    // Método que muestra los autores vivos en un año especifico
     private void listarAutoresPorYear() {
+        System.out.println("Ingresa el año vivo del autor(es) que quiere buscar:");
+        try{
+            int year = teclado.nextInt();
+            teclado.nextLine();
+            List<Autor> autores = repositorio.buscarAutoresVivosEn(year);
+            if(!autores.isEmpty()){
+                autores.forEach(System.out::println);
+            } else {
+                System.out.println("No hay autores registrados en ese año");
+            }
+        } catch(InputMismatchException e) {
+            teclado.nextLine();
+            System.out.println("Dato ingresado invalido.");
+        }
     }
 
+    // Método que lista los libros registrados por un idioma específico
     private void listarLibrosPorIdioma() {
+        List<String> opciones = new ArrayList<>(List.of("es", "en","fr", "pt"));
+        String menu = """
+                Ingrese el idioma para buscar los libros:
+                es - español
+                en - inglés
+                fr - frances
+                pt - portugués
+                """;
+        System.out.println(menu);
+        var op = teclado.nextLine();
+        if(opciones.contains(op)){
+            List<Libro> libros = repositorio.obtenerPorIdioma(op);
+            if(!libros.isEmpty()){
+                libros.forEach(System.out::println);
+            } else {
+                System.out.println("No se encontro algún libro con el idioma: " + op);
+            }
+        } else {
+            System.out.println("Opcion no reconocida");
+        }
+
     }
 
+    // Método que ayuda a traer la información de la API
     private Optional<DatosLibro> obtenerLibro(String titulo) {
         var json = ConsumoAPI.obtenerDatos(BASE_URL + "?search=" + titulo.replace(" ", "+"));
         Datos datos = conversor.convierteDatos(json, Datos.class);
@@ -115,11 +161,13 @@ public class Principal {
         return datos.resultados().stream().findFirst();
     }
 
+    // Método que verifica si ya se encuentra un libro registrado
     private boolean estaLibro(String titulo){
         Optional<Libro> libroBuscado = repositorio.obtenerLibro(titulo);
         return libroBuscado.isPresent();
     }
 
+    // Mpetodo que ayuda a registrarLibro() para almacenarlo
     private void guardarLibro(DatosLibro datosLibro) {
         Autor autor = new Autor(datosLibro.autor().get(0));
         Libro libro = new Libro(datosLibro);
@@ -132,11 +180,14 @@ public class Principal {
         } else {
             autor.agregarLibro(libro);
             repositorio.save(autor);
+            System.out.println(libro);
         }
     }
 
+    // Método que ayuda a mapear un autor en en repositorio
     private boolean buscarAutor(String nombre){
         Optional<Autor> autorEncontrado = repositorio.findBynombreContainingIgnoreCase(nombre);
         return autorEncontrado.isPresent();
     }
+
 }

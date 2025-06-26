@@ -20,3 +20,7 @@ proporcionando 5 opciones de interacción. Los libros se buscarán a través de 
 <li>Listar autores vivos en un determinado year</li>
 <li>Listar libros por idioma</li>
 </ol>
+
+# Estado del Reto
+
+- Finalizado.

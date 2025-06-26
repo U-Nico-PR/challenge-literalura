@@ -1,7 +1,9 @@
 package com.aluracursos.challenge_literalura.model;
 
 import jakarta.persistence.*;
-
+/*
+Esta clase es un objeto libro y se hace también una entidad para la base de datos
+ */
 @Entity
 @Table(name = "libros")
 public class Libro {
@@ -17,6 +19,7 @@ public class Libro {
     @ManyToOne
     private Autor autor;
 
+    // Constructor predeterminado
     public Libro(){}
 
     public Libro(DatosLibro datos){
@@ -24,6 +27,8 @@ public class Libro {
         this.idioma = datos.idioma().get(0);
         this.numeroDeDescargas = datos.numeroDeDescargas();
     }
+
+    // Solo se colocarón los métodos necesarios
 
     public String getTitulo(){
         return titulo;
@@ -33,9 +38,11 @@ public class Libro {
         this.autor = autor;
     }
 
+    // Método para imprimir un objeto Libro
+
     @Override
     public String toString() {
-        return "\n--------------------\n" +
+        return "\n---------- Libro ----------\n" +
                 "Titulo: " + titulo +
                 "\nAutor: " + autor.getNombre() +
                 "\nIdioma: " + idioma +
